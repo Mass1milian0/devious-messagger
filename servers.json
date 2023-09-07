@@ -1,0 +1,17 @@
+[
+    {
+        "label": "ATM9",
+        "description": "Get whitelisted on All the mods 9",
+        "value": "ATM901,http://127.0.0.1:8080/API,atm9.devious.gg,0.0.56"
+    },
+	{
+        "label": "VH3",
+        "description": "Get whitelisted on Vault Hunters 3",
+        "value": "VH301,http://127.0.0.1:8080/API,vh3.devious.gg,3.11.2.1"
+	},
+	{
+        "label": "E9E",
+        "description": "Get whitelisted on Enigmatica 9 Expert",
+        "value": "E9E01,http://127.0.0.1:8080/API,e9e.devious.gg,1.11.2"
+	}
+]
