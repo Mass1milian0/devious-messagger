@@ -16,7 +16,7 @@ const envToLogger = {
 const fastify = require('fastify')({
     logger: envToLogger["development"]
 })
-fastify.register(require('@fastify/static'), {
+fastify.register(require('fastify-static'), {
     root: `${__dirname}//public`,
     prefix: '/', // optional: default '/'
 

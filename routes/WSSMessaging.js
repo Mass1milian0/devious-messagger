@@ -11,10 +11,7 @@ const route = {
     wsHandler: (conn, req) => {
         conn.setEncoding('utf8')
         req.log.info('socket connected')
-        conn.socket.send(JSON.stringify({
-            "calling": "onOpen",
-            "event": "identify"
-        }))
+        conn.socket.send("Hello!")
         req.log.info("Sent identify event to client")
         fs.readdirSync(`./routes/WSSMessagingEvents`).forEach(event => {
             let eventHandle = require(`./WSSMessagingEvents/${event}`)
