@@ -1,5 +1,6 @@
 require('dotenv').config()
 require('./register-commands')
+require('./router')
 const fs = require('fs')
 const {Client, Collection, Intents} = require("discord.js")
 const client = new Client({
@@ -23,8 +24,8 @@ for (const file of commandFiles) {
 
 client.on("ready", async() => { 
 
-    console.info("\nDevious Discord Bot Copyright (C) 2022 By:M1S0 \n (GNU GENERAL PUBLIC LICENSE)[Version 3, 29 June 2007] \n This program comes with ABSOLUTELY NO WARRANTY; \n This is free software, and you are welcome to do as you please under one condition, \n Proper credit be given by documenting our names for the work we have done. \n");
-    console.info("Whitelist Bot loaded Succesfully") //RIP "bot is ready to roll"
+    console.info("\nDevious Discord Bot Copyright (C) 2023 By:M1S0 \n (GNU GENERAL PUBLIC LICENSE)[Version 3, 29 June 2007] \n This program comes with ABSOLUTELY NO WARRANTY; \n This is free software, and you are welcome to do as you please under one condition, \n Proper credit be given by documenting our names for the work we have done. \n");
+    console.info("Devious Integration Bot loaded Succesfully") //RIP "bot is ready to roll"
 })
 
 //User leaves discord, remove them from whitelist, DB, and kick them from server just incase they are on it

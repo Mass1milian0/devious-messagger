@@ -1,6 +1,7 @@
 module.exports = (conn, req) => {
     conn.socket.on('message', (message) => {
         message = JSON.parse(message)
+        console.log(message)
         if (message.event == "identify") {
             global.wssConnectedPeers[message.identifier] = conn
             //i send the new connection the peerConnected

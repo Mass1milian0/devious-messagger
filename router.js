@@ -24,6 +24,13 @@ fastify.register(require('@fastify/static'), {
 fastify.register(require('@fastify/websocket'), {
     options: { maxPayload: 1048576 }
 })
+fastify.register(async function (fastify, opts) {
+    fastify.get('/WSMessaging', { websocket: true }, (connection, req) => {
+        connection.socket.on('message', message => {
+            console.log(message)
+        })
+    })
+})
 fastify.get(
     "/", (req, reply) => {
 
@@ -32,7 +39,7 @@ fastify.get(
 )
 const start = async () => {
     try {
-        fastify.listen({port: port, host: '0.0.0.0'})
+        await fastify.listen({port: port, host: '127.0.0.1'})
         console.log("application started on port: " + port)
     } catch (err) {
         fastify.log.error(err)
