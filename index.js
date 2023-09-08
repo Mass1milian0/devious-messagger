@@ -1,7 +1,7 @@
 require('dotenv').config()
-require('./register-commands')
-require('./router')
-const fs = require('fs')
+//require('./register-commands')
+require('./router.js')
+/*const fs = require('fs')
 const {Client, Collection, Intents} = require("discord.js")
 const client = new Client({
     intents: [Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES],
@@ -49,4 +49,4 @@ client.on('interactionCreate', async interaction => {
     }
 })
 
-client.login(process.env.DISCORD_TOKEN)
+client.login(process.env.DISCORD_TOKEN)*/
