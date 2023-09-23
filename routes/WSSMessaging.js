@@ -11,8 +11,10 @@ const route = {
     wsHandler: (conn, req) => {
         conn.setEncoding('utf8')
         req.log.info('socket connected')
-        conn.socket.send("Hello!")
-        req.log.info("Sent identify event to client")
+        req.log.info("asking for identification")
+        conn.socket.send(JSON.stringify({
+            event: "identify"
+        }))
         fs.readdirSync(`./routes/WSSMessagingEvents`).forEach(event => {
             let eventHandle = require(`./WSSMessagingEvents/${event}`)
             if (Array.isArray(eventHandle)) {
@@ -20,6 +22,19 @@ const route = {
             } else {
                 eventHandle(conn, req)
             }
+        })
+        global.discordMessager.on("globalMessage", (message) => {
+            console.log("global message received, event received")
+            Object.values(global.wssConnectedPeers).forEach(peer => {
+                console.log("sending message to peer")
+                console.log(peer)
+                peer.socket.send(JSON.stringify({
+                    event: "message",
+                    username: message.author.username,
+                    channel: "global",
+                    message: message.content
+                }))
+            })
         })
     }
 }
