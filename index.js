@@ -60,6 +60,8 @@ client.on("ready", async() => {
                 message: message.content
             }))
         }
+        //relay to global
+        global.discordMessager.sendToGlobal(`[${server}] ${message.author.username}: ${message.content}`)
     })
 })
 
