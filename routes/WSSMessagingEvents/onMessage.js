@@ -23,8 +23,10 @@ module.exports = (conn, req) => {
             let server = message.server
             let player = message.player
             let content = message.message
-            global.discordMessager.sendToGlobal(`[${server}] ${player}: ${content}`)
-            global.discordMessager.sendToServer(server, `${player}: ${content}`)
+            let uuid = message.uuid
+            let userIcon = `https://crafatar.com/avatars/${uuid}`;
+            global.discordMessager.sendToGlobal(`[${server}] ${content}`, player, userIcon)
+            global.discordMessager.sendToServer(server, `${player}: ${content}`, player, userIcon)
             //send globally to all connected peers but the sender
             Object.values(global.wssConnectedPeers).forEach(peer => {
                 if (peer.socket != conn.socket) {

@@ -20,7 +20,7 @@ require('dotenv').config();
 const fs = require('fs');
 const EventEmitter = require('events');
 
-class DiscordMessager extends EventEmitter {
+class DiscordMessager extends EventEmitter{
     constructor(client){
         super()
         this.client = client
@@ -28,6 +28,28 @@ class DiscordMessager extends EventEmitter {
         let chatMap = fs.readFileSync('./chatMap.json')
         this.chatMap = JSON.parse(chatMap)
         this.globalChannel = this.chatMap.find(channel => channel.name == "global")
+
+        //setup a webhook to send to the mapped channels if it's not already set up
+        for(let channel of this.chatMap){
+            if(channel.webhookId) continue;
+            //check if the channel has a webhook
+            this.client.channels.cache.get(channel.channelId).fetchWebhooks().then(webhooks => {
+                //if it has a webhook, check if it's the correct name, it should have the name "Devious Messager"
+                let webhook = webhooks.find(webhook => webhook.name == "Devious Messager")
+                //if it doesn't have a webhook, create one
+                if(!webhook){
+                    this.client.channels.cache.get(channel.channelId).createWebhook("Devious Messager", {
+                        avatar: process.env.BOT_AVATAR_URL,
+                        name: "Devious Messager"
+                    }).then(webhook => {
+                        //now we have a webhook, let's save it to the chatMap
+                        channel.webhookId = webhook.id
+                        channel.webhookToken = webhook.token
+                        this.chatMap[this.chatMap.indexOf(channel)] = channel
+                    })
+                }
+            })
+        }
 
         //initialize message listener and event emitter
         this.client.on('messageCreate', (message) => {
@@ -45,30 +67,32 @@ class DiscordMessager extends EventEmitter {
             }
         })
     }
-    async sendToGlobal(message){
-        this.client.channels.cache.get(this.globalChannel.channelId).send(message)
+    async sendToGlobal(message, username, avatar){
+        if(!username) username = "Devious Messager"
+        if(!avatar) avatar = process.env.BOT_AVATAR_URL
+        let globalChannel = this.chatMap.find(channel => channel.name == "global")
+        let webhook = await this.client.channels.cache.get(globalChannel.channelId).fetchWebhooks()
+        webhook = webhook.find(webhook => webhook.name == "Devious Messager")
+        webhook.send({
+            content: message,
+            username: username,
+            avatarURL: avatar
+        })
     }
-    async sendToServer(server, message){
-        let serverChannel = this.chatMap.find(channel => channel.name == server)
-        this.client.channels.cache.get(serverChannel.channelId).send(message)
-    }
-    async setBotProfilePicture(url){
-        await this.client.user.setAvatar(url)
+    async sendToServer(server, message, username, avatar){
+        if(!username) username = "Devious Messager"
+        if(!avatar) avatar = process.env.BOT_AVATAR_URL
+        let channel = this.chatMap.find(channel => channel.name == server)
+        let webhook = await this.client.channels.cache.get(channel.channelId).fetchWebhooks()
+        webhook = webhook.find(webhook => webhook.name == "Devious Messager")
+        webhook.send({
+            content: message,
+            username: username,
+            avatarURL: avatar
+        })
     }
     async setBotStatus(status){
         await this.client.user.setActivity(status)
-    }
-    async setBotUsername(username){
-        await this.client.user.setUsername(username)
-    }
-    async resetBotProfilePicture(){
-        await this.client.user.setAvatar(process.env.BOT_AVATAR_URL)
-    }
-    async resetBotStatus(){
-        await this.client.user.setActivity("nothing")
-    }
-    async resetBotUsername(){
-        await this.client.user.setUsername("Devious Messager")
     }
 }
 
