@@ -18,12 +18,12 @@ Devious Messager is free software: you can redistribute it and/or modify
 */
 module.exports = (conn, req) => {
     conn.socket.on('close', () => {
-        let backup = global.wssConnectedPeers
-        global.wssConnectedPeers = {}
-        Object.values(backup).forEach(conSock => {
-            conSock.socket.send(JSON.stringify({
-                event: "identify"
-            }))
-        })
+        //check who closed the connection
+        let closed = Object.keys(global.wssConnectedPeers).find(key => global.wssConnectedPeers[key].socket == conn.socket)
+        //send a message to servers and global chat saying that the server has shut down
+        global.discordMessager.sendToGlobal(`[${closed}] Server is stopping.`)
+        global.discordMessager.sendToServer(closed, `Server is stopping.`)
+        //remove the server from the connected peers list
+        delete global.wssConnectedPeers[closed]
     })
 }
