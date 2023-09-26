@@ -26,9 +26,19 @@ module.exports = (conn, req) => {
             if(state == "joined"){
                 global.discordMessager.sendToServer(server, `${player} joined the game.`)
                 global.discordMessager.sendToGlobal(`[${server}] ${player} joined the game.`)
+                Object.values(global.wssConnectedPeers).forEach(peer => {
+                    peer.socket.send(JSON.stringify({
+                        event: "playerCount"
+                    }))
+                })
             }else {
                 global.discordMessager.sendToServer(server, `${player} left the game.`)
                 global.discordMessager.sendToGlobal(`[${server}] ${player} left the game.`)
+                Object.values(global.wssConnectedPeers).forEach(peer => {
+                    peer.socket.send(JSON.stringify({
+                        event: "playerCount"
+                    }))
+                })
             }
         }
     })
