@@ -20,7 +20,12 @@ module.exports = (conn, req) => {
     conn.socket.on('message', (message) => {
         message = JSON.parse(message)
         if(message.event == "identify"){
-            global.wssConnectedPeers[message.identifier] = conn
+            //to avoid duplicates we check if the server is already connected
+            if(!global.wssConnectedPeers[message.identifier]){
+                global.wssConnectedPeers[message.identifier] = conn
+                global.discordMessager.sendToGlobal(`[${message.identifier}] Server is starting.`)
+                global.discordMessager.sendToServer(message.identifier, `Server is starting.`)
+            }
         }
     })
 }

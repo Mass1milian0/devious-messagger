@@ -22,7 +22,7 @@ module.exports = (conn, req) => {
         if (message.event == "playerState") {
             let server = message.server
             let player = message.player
-            let state = message.state
+            let state = message.joined
             if(state == "joined"){
                 global.discordMessager.sendToServer(server, `${player} joined the game.`)
                 global.discordMessager.sendToGlobal(`[${server}] ${player} joined the game.`)
