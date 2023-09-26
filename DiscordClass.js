@@ -52,6 +52,24 @@ class DiscordMessager extends EventEmitter {
         let serverChannel = this.chatMap.find(channel => channel.name == server)
         this.client.channels.cache.get(serverChannel.channelId).send(message)
     }
+    async setBotProfilePicture(url){
+        await this.client.user.setAvatar(url)
+    }
+    async setBotStatus(status){
+        await this.client.user.setActivity(status)
+    }
+    async setBotUsername(username){
+        await this.client.user.setUsername(username)
+    }
+    async resetBotProfilePicture(){
+        await this.client.user.setAvatar(process.env.BOT_AVATAR_URL)
+    }
+    async resetBotStatus(){
+        await this.client.user.setActivity("nothing")
+    }
+    async resetBotUsername(){
+        await this.client.user.setUsername("Devious Messager")
+    }
 }
 
 module.exports = DiscordMessager
