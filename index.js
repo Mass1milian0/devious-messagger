@@ -63,6 +63,15 @@ client.on("ready", async() => {
         //relay to global
         global.discordMessager.sendToGlobal(`[${server}] ${message.content}`, message.author.username, message.author.avatarURL())
     })
+
+    setTimeout(() => {
+        global.playerCount = 0 
+        for(let peer of Object.values(global.wssConnectedPeers)){
+            peer.socket.send(JSON.stringify({
+                event: "playerCount"
+            }))
+        }
+    }, 20*1000)
 })
 
 client.login(process.env.DISCORD_TOKEN)

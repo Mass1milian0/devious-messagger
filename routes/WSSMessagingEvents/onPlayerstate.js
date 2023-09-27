@@ -25,22 +25,18 @@ module.exports = (conn, req) => {
             let state = message.joined
             let uuid = message.uuid
             let userIcon = `https://crafatar.com/avatars/${uuid}`;
+            global.playerCount = 0
+            Object.values(global.wssConnectedPeers).forEach(peer => {
+                peer.socket.send(JSON.stringify({
+                    event: "playerCount"
+                }))
+            })
             if(state == "joined"){
                 global.discordMessager.sendToServer(server, `${player} joined the game.`, player, userIcon)
                 global.discordMessager.sendToGlobal(`[${server}] ${player} joined the game.`, player, userIcon)
-                Object.values(global.wssConnectedPeers).forEach(peer => {
-                    peer.socket.send(JSON.stringify({
-                        event: "playerCount"
-                    }))
-                })
             }else {
                 global.discordMessager.sendToServer(server, `${player} left the game.`, player, userIcon)
                 global.discordMessager.sendToGlobal(`[${server}] ${player} left the game.`, player, userIcon)
-                Object.values(global.wssConnectedPeers).forEach(peer => {
-                    peer.socket.send(JSON.stringify({
-                        event: "playerCount"
-                    }))
-                })
             }
         }
     })
