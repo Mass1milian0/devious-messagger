@@ -64,6 +64,18 @@ client.on("ready", async() => {
         global.discordMessager.sendToGlobal(`[${server}] ${message.content}`, message.author.username, message.author.avatarURL())
     })
 
+    global.discordMessager.on("globalStaffMessage", (message) => {
+        Object.values(global.wssConnectedPeers).forEach(peer => {
+            peer.socket.send(JSON.stringify({
+                event: "message",
+                username: message.author.username,
+                channel: "server",
+                serverName: "Announcement",
+                message: message.content
+            }))
+        })
+    })
+
     setTimeout(() => {
         global.playerCount = 0 
         for(let peer of Object.values(global.wssConnectedPeers)){

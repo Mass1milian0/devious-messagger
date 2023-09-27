@@ -28,11 +28,10 @@ class DiscordMessager extends EventEmitter{
         let chatMap = fs.readFileSync('./chatMap.json')
         this.chatMap = JSON.parse(chatMap)
         this.globalChannel = this.chatMap.find(channel => channel.name == "global")
+        this.globalStaffChannel = this.chatMap.find(channel => channel.name == "global-staff")
 
         //setup a webhook to send to the mapped channels if it's not already set up
         for(let channel of this.chatMap){
-            if(channel.webhookId) continue;
-            //check if the channel has a webhook
             this.client.channels.cache.get(channel.channelId).fetchWebhooks().then(webhooks => {
                 //if it has a webhook, check if it's the correct name, it should have the name "Devious Messager"
                 let webhook = webhooks.find(webhook => webhook.name == "Devious Messager")
@@ -53,6 +52,11 @@ class DiscordMessager extends EventEmitter{
 
         //initialize message listener and event emitter
         this.client.on('messageCreate', (message) => {
+            if(message.channelId == this.globalStaffChannel.channelId){
+                //ignore bot messages
+                if(message.author.bot) return
+                this.emit('globalStaffMessage', message)
+            }
             if (message.channelId == this.globalChannel.channelId) {
                 //ignore bot messages
                 if (message.author.bot) return
