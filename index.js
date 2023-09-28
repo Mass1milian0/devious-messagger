@@ -74,6 +74,10 @@ client.on("ready", async() => {
                 message: message.content
             }))
         })
+        for (let key of Object.keys(global.wssConnectedPeers)) {
+            global.discordMessager.sendToServer(key, `[Announcement] ${message.content}`, message.author.username, message.author.avatarURL())
+        }
+        global.discordMessager.sendToGlobal(`[Announcement] ${message.content}`, message.author.username, message.author.avatarURL())
     })
 
     setTimeout(() => {
