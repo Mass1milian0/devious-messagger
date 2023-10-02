@@ -18,6 +18,7 @@ after that you need to create a .env file in the project directory which contain
 DISCORD_TOKEN: # your discord bot token
 CLIENTID: # your discord bot client id
 GUILDID: # your discord guild id
+BOT_AVATAR_URL: # your url for the bot avatar
 ```
 
 ## Usage
@@ -43,6 +44,13 @@ identifiers and their corresponding ids
 ]
 ```
 do note that the name is case sensitive and has to be the same as the one configured in the mod
+
+Important: there are 2 names which are handled in a special way
+
+``"global"`` this chat will relay to the global chat channel on the mod, which is an opt-in option
+every single message from every server will also be sent to this chat, discord messages will also relay to this chat
+
+``"global-staff"`` this chat will relay a message to all servers, regardless of the user settings, this can be used for important announcements
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
