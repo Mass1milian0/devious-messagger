@@ -69,7 +69,7 @@ client.on("ready", async() => {
         Object.values(global.wssConnectedPeers).forEach(peer => {
             peer.socket.send(JSON.stringify({
                 event: "message",
-                username: message.author.username,
+                username: "[STAFF] "+message.author.username,
                 channel: "server",
                 serverName: "Announcement",
                 message: message.content
