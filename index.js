@@ -61,6 +61,7 @@ client.on("ready", async() => {
             }))
         }
         //relay to global
+        if(message.author.bot) return
         global.discordMessager.sendToGlobal(`[${server}] ${message.content}`, message.author.username, message.author.avatarURL())
     })
 
