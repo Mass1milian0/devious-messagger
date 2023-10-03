@@ -29,6 +29,9 @@ class DiscordMessager extends EventEmitter{
         this.chatMap = JSON.parse(chatMap)
         this.globalChannel = this.chatMap.find(channel => channel.name == "global")
         this.globalStaffChannel = this.chatMap.find(channel => channel.name == "global-staff")
+        //if global channel or global staff channel doesn't exist, assign '0' to the channelId
+        if(!this.globalChannel) this.globalChannel = {channelId: '0'}
+        if(!this.globalStaffChannel) this.globalStaffChannel = {channelId: '0'}
 
         //setup a webhook to send to the mapped channels if it's not already set up
         for(let channel of this.chatMap){
