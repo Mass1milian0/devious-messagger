@@ -58,17 +58,17 @@ class DiscordMessager extends EventEmitter{
             if(message.channelId == this.globalStaffChannel.channelId){
                 //ignore bot messages
                 if(message.author.bot) return
-                this.emit('globalStaffMessage', message)
+                return this.emit('globalStaffMessage', message)
             }
             if (message.channelId == this.globalChannel.channelId) {
                 //ignore bot messages
                 if (message.author.bot) return
-                this.emit('globalMessage', message)
+                return this.emit('globalMessage', message)
             } else {
                 this.chatMap.forEach(channel => {
                     if (message.channelId == channel.channelId) {
                         if (message.author.bot) return
-                        this.emit('serverMessage', message, channel.name)
+                        return this.emit('serverMessage', message, channel.name)
                     }
                 })
             }
