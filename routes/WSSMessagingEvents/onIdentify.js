@@ -23,8 +23,8 @@ module.exports = (conn, req) => {
             //to avoid duplicates we check if the server is already connected
             if(!global.wssConnectedPeers[message.identifier]){
                 global.wssConnectedPeers[message.identifier] = conn
-                global.discordMessager.sendToGlobal(`[${message.identifier}] Server is starting.`)
-                global.discordMessager.sendToServer(message.identifier, `Server is starting.`)
+                global.discordMessager.sendToGlobal(`[${message.identifier}] Websocket has connected.`)
+                global.discordMessager.sendToServer(message.identifier, `Websocket has connected.`)
                 global.playerCount = 0 
                 for(let peer of Object.values(global.wssConnectedPeers)){
                     peer.socket.send(JSON.stringify({

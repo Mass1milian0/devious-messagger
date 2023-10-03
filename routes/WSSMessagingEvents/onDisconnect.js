@@ -26,8 +26,8 @@ module.exports = (conn, req) => {
             }
         }
         //send a message to servers and global chat saying that the server has shut down
-        global.discordMessager.sendToGlobal(`[${closed}] Server is stopping.`)
-        global.discordMessager.sendToServer(closed, `Server is stopping.`)
+        global.discordMessager.sendToGlobal(`[${closed}] Websocket has disconnected.`)
+        global.discordMessager.sendToServer(closed, `Websocket has disconnected.`)
         //remove the server from the connected peers list
         delete global.wssConnectedPeers[closed]
     })
