@@ -19,6 +19,7 @@ DISCORD_TOKEN: # your discord bot token
 CLIENTID: # your discord bot client id
 GUILDID: # your discord guild id
 BOT_AVATAR_URL: # your url for the bot avatar
+NODE_ENV: # the environment the server is running in (development or production)
 ```
 
 ## Usage
@@ -45,12 +46,27 @@ identifiers and their corresponding ids
 ```
 do note that the name is case sensitive and has to be the same as the one configured in the mod
 
-Important: there are 2 names which are handled in a special way
+Important: there are 3 names which are handled in a special way
 
 ``"global"`` this chat will relay to the global chat channel on the mod, which is an opt-in option
 every single message from every server will also be sent to this chat, discord messages will also relay to this chat
 
 ``"global-staff"`` this chat will relay a message to all servers, regardless of the user settings, this can be used for important announcements
+
+``"ticket-category"`` this chat will be used to notify the creation of tickets, this is a **category** channel and not a text channel
+
+there is also a secondary json called "staffMap.json" which contains the names of the staffers in minecraft and their corresponding discord ids
+
+```json
+[
+    {
+        "name": "my name",
+        "discordId": "123456789012345678"
+    }
+]
+```
+
+do note that discord ids are unused at the moment, but will be used in the future
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
