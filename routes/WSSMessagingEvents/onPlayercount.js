@@ -20,6 +20,7 @@ module.exports = (conn, req) => {
     conn.socket.on('message', (message) => {
         message = JSON.parse(message)
         if (message.event == "playerCount") {
+            global.verboseLog("playerCount event recieved with count: " + message.count)
             let count = message.count
             global.playerCount += count
             global.discordMessager.setBotStatus(`${global.playerCount} players online`)

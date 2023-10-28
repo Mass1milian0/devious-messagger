@@ -20,12 +20,18 @@ module.exports = (conn, req) => {
     conn.socket.on('message', (message) => {
         message = JSON.parse(message)
         if (message.event == "message") {
+            global.verboseLog("message event recieved by: " + message.player + " on server: " + message.server + " in channel: " + message.channel + " with message: " + message.message + " and uuid: " + message.uuid)
             let server = message.server
             let player = message.player
             let content = message.message
             let uuid = message.uuid
             let channel = message.channel
             let userIcon = `https://crafatar.com/avatars/${uuid}`;
+            //kick in the emergency identification system
+            if(!global.wssConnectedPeers[server]){
+                global.verboseLog("server not found in wssConnectedPeers, adding it to the list")
+                global.wssConnectedPeers[server] = conn
+            }
             global.discordMessager.sendToGlobal(`[${server}] <${channel}>: ${content}`, player, userIcon)
             global.discordMessager.sendToServer(server, `<${channel}>: ${content}`, player, userIcon)
             //send globally to all connected peers but the sender

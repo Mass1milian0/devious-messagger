@@ -16,6 +16,27 @@ Devious Messager is free software: you can redistribute it and/or modify
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   
 */
+global.environment = process.env.NODE_ENV || "development"
+global.verboseLog = (message) => {
+    function writeToLogs(message,fs){
+        let date = new Date()
+        if (!fs.existsSync('./logs')) {
+            fs.mkdirSync('./logs');
+        }
+        fs.appendFileSync("./logs/verbose.log", `[${date.toLocaleString()}] - ${message} \n`)
+    }
+    if(global.environment == "development"){        
+        console.log(message)
+        //write to log file
+        //create logs folder if it doesnt exist
+        if(!fs){
+            fs = require('fs')
+            writeToLogs(message,fs)
+        }else{
+            writeToLogs(message,fs)
+        }
+    }
+}
 require('dotenv').config()
 const fs = require('fs')
 const {Client, Intents} = require("discord.js")
@@ -34,12 +55,14 @@ client.on("ready", async() => {
 
     console.info("\nDevious Discord Messager Copyright (C) 2023 By:M1S0 \n (GNU GENERAL PUBLIC LICENSE)[Version 3, 29 June 2007] \n This program comes with ABSOLUTELY NO WARRANTY; \n This is free software, and you are welcome to do as you please under one condition, \n Proper credit be given by documenting our names for the work we have done. \n");
     console.info("Messager Bot loaded Succesfully") //RIP "bot is ready to roll"
+    global.verboseLog("client on ready fired")
     global.discordMessager = new DiscordMessager(client)
     require('./router.js')
     global.discordMessager.setBotStatus(`0 players online`)
+    global.verboseLog("discord messager created")
     global.discordMessager.on("globalMessage", (message) => {
+        global.verboseLog("received global message from discord")
         Object.values(global.wssConnectedPeers).forEach(peer => {
-            console.log("sending message to peer")
             peer.socket.send(JSON.stringify({
                 event: "message",
                 username: message.author.username,
@@ -48,8 +71,10 @@ client.on("ready", async() => {
                 message: message.content
             }))
         })
+        global.verboseLog("sent global message to all peers")
     })
     global.discordMessager.on("serverMessage", (message,server) => {
+        global.verboseLog("received server message from discord by server: "+server)
         let serverSocket = global.wssConnectedPeers[server]
         if (serverSocket) {
             serverSocket.socket.send(JSON.stringify({
@@ -63,9 +88,11 @@ client.on("ready", async() => {
         //relay to global
         if(message.author.bot) return
         global.discordMessager.sendToGlobal(`[${server}] ${message.content}`, message.author.username, message.author.avatarURL())
+        global.verboseLog("relayed server message to global")
     })
 
     global.discordMessager.on("globalStaffMessage", (message) => {
+        global.verboseLog("received global staff message from discord")
         Object.values(global.wssConnectedPeers).forEach(peer => {
             peer.socket.send(JSON.stringify({
                 event: "message",
@@ -83,6 +110,7 @@ client.on("ready", async() => {
 
     setTimeout(() => {
         global.playerCount = 0 
+        global.verboseLog("asking for player count")
         for(let peer of Object.values(global.wssConnectedPeers)){
             peer.socket.send(JSON.stringify({
                 event: "playerCount"

@@ -20,11 +20,16 @@ module.exports = (conn, req) => {
     conn.socket.on('message', (message) => {
         message = JSON.parse(message)
         if (message.event == "playerState") {
+            global.verboseLog("playerState event recieved with player: " + message.player + " on server: " + message.server + " with state: " + message.joined + " and uuid: " + message.uuid)
             let server = message.server
             let player = message.player
             let state = message.joined
             let uuid = message.uuid
             let userIcon = `https://crafatar.com/avatars/${uuid}`;
+            if(!global.wssConnectedPeers[server]){
+                global.verboseLog("server not found in wssConnectedPeers, adding it to the list")
+                global.wssConnectedPeers[server] = conn
+            }
             global.playerCount = 0
             Object.values(global.wssConnectedPeers).forEach(peer => {
                 peer.socket.send(JSON.stringify({
