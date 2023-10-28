@@ -20,9 +20,11 @@ module.exports = (conn, req) => {
     conn.socket.on('message', (message) => {
         message = JSON.parse(message)
         if(message.event == "identify"){
+            global.verboseLog("identify event recieved by" + message.identifier)
             //to avoid duplicates we check if the server is already connected
             if(!global.wssConnectedPeers[message.identifier]){
                 global.wssConnectedPeers[message.identifier] = conn
+                global.verboseLog("server added to wssConnectedPeers")
                 global.discordMessager.sendToGlobal(`[${message.identifier}] Websocket has connected.`)
                 global.discordMessager.sendToServer(message.identifier, `Websocket has connected.`)
                 global.playerCount = 0 

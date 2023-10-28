@@ -18,6 +18,7 @@ Devious Messager is free software: you can redistribute it and/or modify
 */
 module.exports = (conn, req) => {
     conn.socket.on('close', () => {
+        global.verboseLog("websocket connection closed")
         //check who closed the connection
         let closed 
         for (let i of Object.keys(global.wssConnectedPeers)){
@@ -25,6 +26,7 @@ module.exports = (conn, req) => {
                 closed = i
             }
         }
+        global.verboseLog("server closed: " + closed)
         //send a message to servers and global chat saying that the server has shut down
         global.discordMessager.sendToGlobal(`[${closed}] Websocket has disconnected.`)
         global.discordMessager.sendToServer(closed, `Websocket has disconnected.`)
