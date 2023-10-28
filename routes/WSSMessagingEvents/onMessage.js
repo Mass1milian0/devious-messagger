@@ -32,8 +32,8 @@ module.exports = (conn, req) => {
                 global.verboseLog("server not found in wssConnectedPeers, adding it to the list")
                 global.wssConnectedPeers[server] = conn
             }
-            global.discordMessager.sendToGlobal(`[${server}] <${channel}>: ${content}`, player, userIcon)
-            global.discordMessager.sendToServer(server, `<${channel}>: ${content}`, player, userIcon)
+            global.discordMessager.sendToGlobal(`[${server}]: ${content}`, `${player} / ${channel}`, userIcon)
+            global.discordMessager.sendToServer(server, `${content}`, `${player} / ${channel}`, userIcon)
             //send globally to all connected peers but the sender
             Object.values(global.wssConnectedPeers).forEach(peer => {
                 if (peer.socket != conn.socket) {

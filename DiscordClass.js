@@ -35,6 +35,10 @@ class DiscordMessager extends EventEmitter{
 
         //setup a webhook to send to the mapped channels if it's not already set up
         for(let channel of this.chatMap){
+            if(channel.name == "ticket-category") {
+                this.ticketCategory = channel.channelId
+                continue;
+            }
             this.client.channels.cache.get(channel.channelId).fetchWebhooks().then(webhooks => {
                 //if it has a webhook, check if it's the correct name, it should have the name "Devious Messager"
                 let webhook = webhooks.find(webhook => webhook.name == "Devious Messager")
@@ -71,6 +75,11 @@ class DiscordMessager extends EventEmitter{
                         return this.emit('serverMessage', message, channel.name)
                     }
                 })
+            }
+        })
+        this.client.on('channelCreate', (channel) => {
+            if(channel.parentId == this.ticketCategory){
+                this.emit('ticketCreated', channel)
             }
         })
     }

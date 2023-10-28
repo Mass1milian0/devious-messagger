@@ -16,6 +16,7 @@ Devious Messager is free software: you can redistribute it and/or modify
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   
 */
+require('dotenv').config()
 global.environment = process.env.NODE_ENV || "development"
 global.verboseLog = (message) => {
     function writeToLogs(message,fs){
@@ -37,7 +38,6 @@ global.verboseLog = (message) => {
         }
     }
 }
-require('dotenv').config()
 const fs = require('fs')
 const {Client, Intents} = require("discord.js")
 const DiscordMessager = require('./DiscordClass.js')
@@ -90,7 +90,6 @@ client.on("ready", async() => {
         global.discordMessager.sendToGlobal(`[${server}] ${message.content}`, message.author.username, message.author.avatarURL())
         global.verboseLog("relayed server message to global")
     })
-
     global.discordMessager.on("globalStaffMessage", (message) => {
         global.verboseLog("received global staff message from discord")
         Object.values(global.wssConnectedPeers).forEach(peer => {
@@ -107,7 +106,19 @@ client.on("ready", async() => {
         }
         global.discordMessager.sendToGlobal(`[Announcement] ${message.content}`, message.author.username, message.author.avatarURL())
     })
-
+    global.discordMessager.on("ticketCreated", (channel) => {
+        global.verboseLog("ticket created event recieved from discord")
+        let names = fs.readFileSync("./staffMap.json")
+        names = JSON.parse(names)
+        let staff = names.map(name => name.name) ///this returns: ["name1","name2","name3"]
+        Object.values(global.wssConnectedPeers).forEach(peer => {
+            peer.socket.send(JSON.stringify({
+                event: "ticket",
+                names: staff,
+                message: "Ticket created: " + channel.name
+            }))
+        })
+    })
     setTimeout(() => {
         global.playerCount = 0 
         global.verboseLog("asking for player count")
