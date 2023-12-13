@@ -54,6 +54,7 @@ every single message from every server will also be sent to this chat, discord m
 ``"global-staff"`` this chat will relay a message to all servers, regardless of the user settings, this can be used for important announcements
 
 ``"ticket-category"`` this chat will be used to notify the creation of tickets, this is a **category** channel and not a text channel
+``"announcements"`` this chat will be queried for announcements
 
 there is also a secondary json called "staffMap.json" which contains the names of the staffers in minecraft and their corresponding discord ids
 
@@ -67,6 +68,16 @@ there is also a secondary json called "staffMap.json" which contains the names o
 ```
 
 do note that discord ids are unused at the moment, but will be used in the future
+
+and lastly there is another file called serverMap.json which contains the information about the servers, for now limited to the server ip, but could be expanded in the future
+
+```json
+{
+    "ATM9":{
+        "ip": "my.server.ip"
+    }
+}
+```
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
