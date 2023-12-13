@@ -54,6 +54,7 @@ every single message from every server will also be sent to this chat, discord m
 ``"global-staff"`` this chat will relay a message to all servers, regardless of the user settings, this can be used for important announcements
 
 ``"ticket-category"`` this chat will be used to notify the creation of tickets, this is a **category** channel and not a text channel
+
 ``"announcements"`` this chat will be queried for announcements
 
 there is also a secondary json called "staffMap.json" which contains the names of the staffers in minecraft and their corresponding discord ids
