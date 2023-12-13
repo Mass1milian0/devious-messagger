@@ -24,6 +24,13 @@ module.exports = (conn, req) => {
             //to avoid duplicates we check if the server is already connected
             if(!global.wssConnectedPeers[message.identifier]){
                 global.wssConnectedPeers[message.identifier] = conn
+                if(global.serverInfo[message.identifier]){
+                    global.serverInfo[message.identifier].status = "online"
+                }else{
+                    global.serverInfo[message.identifier] = {
+                        status: "online"
+                    }
+                }
                 global.verboseLog("server added to wssConnectedPeers")
                 global.discordMessager.sendToGlobal(`[${message.identifier}] Websocket has connected.`)
                 global.discordMessager.sendToServer(message.identifier, `Websocket has connected.`)

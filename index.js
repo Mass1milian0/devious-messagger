@@ -17,7 +17,10 @@ Devious Messager is free software: you can redistribute it and/or modify
   
 */
 require('dotenv').config()
+const fs = require('fs')
 global.environment = process.env.NODE_ENV || "development"
+global.serverInfo = {};
+global.serverMap = JSON.parse(fs.readFileSync("./serverMap.json"))
 global.verboseLog = (message) => {
     function writeToLogs(message,fs){
         let date = new Date()
@@ -38,7 +41,6 @@ global.verboseLog = (message) => {
         }
     }
 }
-const fs = require('fs')
 const {Client, Intents} = require("discord.js")
 const DiscordMessager = require('./DiscordClass.js')
 const client = new Client({

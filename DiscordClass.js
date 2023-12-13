@@ -29,9 +29,11 @@ class DiscordMessager extends EventEmitter{
         this.chatMap = JSON.parse(chatMap)
         this.globalChannel = this.chatMap.find(channel => channel.name == "global")
         this.globalStaffChannel = this.chatMap.find(channel => channel.name == "global-staff")
+        this.announcementsChannel = this.chatMap.find(channel => channel.name == "announcements")
         //if global channel or global staff channel doesn't exist, assign '0' to the channelId
         if(!this.globalChannel) this.globalChannel = {channelId: '0'}
         if(!this.globalStaffChannel) this.globalStaffChannel = {channelId: '0'}
+        if(!this.announcementsChannel) this.announcementsChannel = {channelId: '0'}
 
         //setup a webhook to send to the mapped channels if it's not already set up
         for(let channel of this.chatMap){
@@ -106,6 +108,23 @@ class DiscordMessager extends EventEmitter{
             username: username,
             avatarURL: avatar
         })
+    }
+    async getAnnouncements(amount){
+        let announcementsChannel = this.announcementsChannel
+        let channel = await this.client.channels.cache.get(announcementsChannel.channelId)
+        let messages = await channel.messages.fetch({limit: amount})
+        let parsedMessages = []
+        messages.forEach(message => {
+            parsedMessages.push({
+                content: message.content,
+                timestamp: message.createdTimestamp,
+                author: {
+                    username: message.author.username,
+                    avatar: message.author.avatarURL()
+                }
+            })
+        })
+        return parsedMessages
     }
     async setBotStatus(status){
         await this.client.user.setActivity(status)

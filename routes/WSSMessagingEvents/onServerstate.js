@@ -22,11 +22,19 @@ module.exports = (conn, req) => {
         if (message.event == "serverState") {
             global.verboseLog("serverState event recieved with server: " + message.server + " with state: " + message.state)
             let server = message.server
+            let state = message.state
+            let parsedState = state == "started" ? "online" : "offline"
             if(!global.wssConnectedPeers[server]){
                 global.verboseLog("server not found in wssConnectedPeers, adding it to the list")
                 global.wssConnectedPeers[server] = conn
+                if(global.serverInfo[message.identifier]){
+                    global.serverInfo[message.identifier].status = parsedState
+                }else{
+                    global.serverInfo[message.identifier] = {
+                        status: parsedState
+                    }
+                }
             }
-            let state = message.state
             let msg = state == "started" ? "has started" : "is stopping"
             global.discordMessager.sendToGlobal(`${server} ${msg}.`)
             global.discordMessager.sendToServer(server, `${server} ${msg}.`)

@@ -22,7 +22,22 @@ module.exports = (conn, req) => {
         if (message.event == "playerCount") {
             global.verboseLog("playerCount event recieved with count: " + message.count)
             let count = message.count
+            let server = message.server
             global.playerCount += count
+            if(!global.wssConnectedPeers[server]){
+                global.verboseLog("server not found in wssConnectedPeers, adding it to the list")
+                global.wssConnectedPeers[server] = conn
+                if(global.serverInfo[message.identifier]){
+                    global.serverInfo[message.identifier].status = "online"
+                    global.serverInfo[server].playersOnline = count
+
+                }else{
+                    global.serverInfo[message.identifier] = {
+                        status: "online",
+                        playersOnline: count
+                    }
+                }
+            }
             global.discordMessager.setBotStatus(`${global.playerCount} players online`)
         }
     })

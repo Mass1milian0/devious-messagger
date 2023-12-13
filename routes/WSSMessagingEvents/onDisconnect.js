@@ -28,6 +28,13 @@ module.exports = (conn, req) => {
         }
         global.verboseLog("server closed: " + closed)
         //send a message to servers and global chat saying that the server has shut down
+        if(global.serverInfo[closed]){
+            global.serverInfo[closed].status = "unreachable"
+        }else{
+            global.serverInfo[closed] = {
+                status: "unreachable"
+            }
+        }
         global.discordMessager.sendToGlobal(`[${closed}] Websocket has disconnected.`)
         global.discordMessager.sendToServer(closed, `Websocket has disconnected.`)
         //remove the server from the connected peers list

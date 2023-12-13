@@ -29,6 +29,13 @@ module.exports = (conn, req) => {
             if(!global.wssConnectedPeers[server]){
                 global.verboseLog("server not found in wssConnectedPeers, adding it to the list")
                 global.wssConnectedPeers[server] = conn
+                if(global.serverInfo[message.identifier]){
+                    global.serverInfo[message.identifier].status = "online"
+                }else{
+                    global.serverInfo[message.identifier] = {
+                        status: "online"
+                    }
+                }
             }
             global.playerCount = 0
             Object.values(global.wssConnectedPeers).forEach(peer => {
