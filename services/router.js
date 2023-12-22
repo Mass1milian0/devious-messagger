@@ -19,6 +19,7 @@ Devious Messager is free software: you can redistribute it and/or modify
 const fs = require('fs')
 const port = process.env.PORT || 8080
 const fastify = require('fastify')()
+const websocketManager = require('./../services/websocketInstance.js')
 fastify.register(require('fastify-static'), {
     root: `${__dirname}//public`,
     prefix: '/', // optional: default '/'
@@ -33,6 +34,7 @@ fastify.get(
         return reply.sendFile('./index.html')
     }
 )
+fastify.decorate('websocketManager', websocketManager)
 const start = async () => {
     try {
         fastify.listen({port: port, host: '0.0.0.0'})
@@ -44,7 +46,7 @@ const start = async () => {
 }
 routes = fs.readdirSync(`./routes`).filter(file => file.endsWith(".js"))
 routes.forEach(route => {
-    let routeHandle = require(`./routes/${route}`)
+    let routeHandle = require(`./../routes/${route}`)
     if (Array.isArray(routeHandle)) {
         routeHandle.forEach(e => fastify.route(e))
     } else {

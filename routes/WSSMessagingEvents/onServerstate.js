@@ -16,28 +16,31 @@ Devious Messager is free software: you can redistribute it and/or modify
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   
 */
+const verboseLog = require("./../services/logger.js")
+const redisInstance = require("./../services/redisInstance.js")
+const {client, discordInstance} = require("./../services/discordInstance.js")
 module.exports = (conn, req) => {
     conn.socket.on('message', (message) => {
         message = JSON.parse(message)
         if (message.event == "serverState") {
-            global.verboseLog("serverState event recieved with server: " + message.server + " with state: " + message.state)
-            let server = message.server
+            verboseLog("serverState event recieved with server: " + message.server + " with state: " + message.state)
+            let identifier = message.server
             let state = message.state
             let parsedState = state == "started" ? "online" : "offline"
-            if(!global.wssConnectedPeers[server]){
-                global.verboseLog("server not found in wssConnectedPeers, adding it to the list")
-                global.wssConnectedPeers[server] = conn
-                if(global.serverInfo[message.identifier]){
-                    global.serverInfo[message.identifier].status = parsedState
-                }else{
-                    global.serverInfo[message.identifier] = {
-                        status: parsedState
-                    }
-                }
+            this.websocketManager.addPeer(identifier, conn)
+            let server = redisInstance.get("servers").find(server => server.server_id == identifier)
+            //update the server status or add it if it doesn't exist
+            if(server){
+                server.status = parsedState
+                redisInstance.set("servers", redisInstance.get("servers").map(server => server.server_id == identifier ? server : server))
+                verboseLog("server status updated")
+            }else{
+                redisInstance.set("servers", [...redisInstance.get("servers"), {server_id: identifier, status: parsedState}])
+                verboseLog("server added")
             }
             let msg = state == "started" ? "has started" : "is stopping"
-            global.discordMessager.sendToGlobal(`${server} ${msg}.`)
-            global.discordMessager.sendToServer(server, `${server} ${msg}.`)
+            discordInstance.sendToGlobal(`${identifier} ${msg}.`)
+            discordInstance.sendToServer(identifier, `${identifier} ${msg}.`)
         }
     })
 }

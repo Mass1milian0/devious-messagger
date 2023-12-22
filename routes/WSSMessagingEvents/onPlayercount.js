@@ -16,29 +16,30 @@ Devious Messager is free software: you can redistribute it and/or modify
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   
 */
+const verboseLog = require("./../services/logger.js")
+const redisInstance = require("./../services/redisInstance.js")
+const {client, discordInstance} = require("./../services/discordInstance.js")
 module.exports = (conn, req) => {
     conn.socket.on('message', (message) => {
         message = JSON.parse(message)
         if (message.event == "playerCount") {
-            global.verboseLog("playerCount event recieved with count: " + message.count)
+            verboseLog("playerCount event recieved with count: " + message.count)
             let count = message.count
-            let server = message.server
-            global.playerCount += count
-            if(!global.wssConnectedPeers[server]){
-                global.verboseLog("server not found in wssConnectedPeers, adding it to the list")
-                global.wssConnectedPeers[server] = conn
-                if(global.serverInfo[message.identifier]){
-                    global.serverInfo[message.identifier].status = "online"
-                    global.serverInfo[server].playersOnline = count
-
-                }else{
-                    global.serverInfo[message.identifier] = {
-                        status: "online",
-                        playersOnline: count
-                    }
-                }
+            let identifier = message.server
+            redisInstance.set("totalPlayerCount", count)
+            this.websocketManager.addPeer(identifier, conn)
+            let server = redisInstance.get("servers").find(server => server.server_id == identifier)
+            //update the server status or add it if it doesn't exist
+            if(server){
+                server.status = "online"
+                server.playersOnline = count
+                redisInstance.set("servers", redisInstance.get("servers").map(server => server.server_id == identifier ? server : server))
+                verboseLog("server status updated")
+            }else{
+                redisInstance.set("servers", [...redisInstance.get("servers"), {server_id: identifier, status: "online", playersOnline: count}])
+                verboseLog("server added")
             }
-            global.discordMessager.setBotStatus(`${global.playerCount} players online`)
+            discordInstance.setBotStatus(`${global.playerCount} players online`)
         }
     })
 }

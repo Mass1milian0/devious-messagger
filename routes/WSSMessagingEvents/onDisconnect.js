@@ -16,28 +16,31 @@ Devious Messager is free software: you can redistribute it and/or modify
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   
 */
+require('dotenv').config();
+const verboseLog = require('../../services/logger')
+const redisInstance = require('../../services/redisInstance')
+const {client, discordInstance} = require('../../services/discordInstance')
 module.exports = (conn, req) => {
     conn.socket.on('close', () => {
-        global.verboseLog("websocket connection closed")
+        verboseLog("websocket connection closed")
         //check who closed the connection
         let closed 
-        for (let i of Object.keys(global.wssConnectedPeers)){
-            if(global.wssConnectedPeers[i] == conn){
+        let peers = this.websocketManager.getAllPeers()
+        for (let i of Object.keys(peers)){
+            if(peers[i] == conn){
                 closed = i
             }
         }
-        global.verboseLog("server closed: " + closed)
-        //send a message to servers and global chat saying that the server has shut down
-        if(global.serverInfo[closed]){
-            global.serverInfo[closed].status = "unreachable"
-        }else{
-            global.serverInfo[closed] = {
-                status: "unreachable"
-            }
+        let server = redisInstance.get("servers").find(server => server.server_id == message.identifier)
+        //update the server status or add it if it doesn't exist
+        if(server){
+            server.status = "unreachable"
+            redisInstance.set("servers", redisInstance.get("servers").map(server => server.server_id == message.identifier ? server : server))
+            verboseLog("server status updated")
         }
-        global.discordMessager.sendToGlobal(`[${closed}] Websocket has disconnected.`)
-        global.discordMessager.sendToServer(closed, `Websocket has disconnected.`)
-        //remove the server from the connected peers list
-        delete global.wssConnectedPeers[closed]
+        this.websocketManager.removePeer(closed)
+        //send a message to servers and global chat saying that the server has disconnected
+        discordInstance.sendToGlobal(`[${closed}] Websocket has disconnected.`)
+        discordInstance.sendToServer(closed, `Websocket has disconnected.`)
     })
 }

@@ -16,31 +16,28 @@ Devious Messager is free software: you can redistribute it and/or modify
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   
 */
-module.exports = (conn, req) => {
+const verboseLog = require("./../services/logger.js")
+const redisInstance = require("./../services/redisInstance.js")
+const {client, discordInstance} = require("./../services/discordInstance.js")
+module.exports = async (conn, req) => {
     conn.socket.on('message', (message) => {
         message = JSON.parse(message)
         if(message.event == "identify"){
-            global.verboseLog("identify event recieved by" + message.identifier)
-            //to avoid duplicates we check if the server is already connected
-            if(!global.wssConnectedPeers[message.identifier]){
-                global.wssConnectedPeers[message.identifier] = conn
-                if(global.serverInfo[message.identifier]){
-                    global.serverInfo[message.identifier].status = "online"
-                }else{
-                    global.serverInfo[message.identifier] = {
-                        status: "online"
-                    }
-                }
-                global.verboseLog("server added to wssConnectedPeers")
-                global.discordMessager.sendToGlobal(`[${message.identifier}] Websocket has connected.`)
-                global.discordMessager.sendToServer(message.identifier, `Websocket has connected.`)
-                global.playerCount = 0 
-                for(let peer of Object.values(global.wssConnectedPeers)){
-                    peer.socket.send(JSON.stringify({
-                        event: "playerCount"
-                    }))
-                }
+            verboseLog("identify event recieved by" + message.identifier)
+            this.websocketManager.addPeer(message.identifier, conn)
+            let server = redisInstance.get("servers").find(server => server.server_id == message.identifier)
+            //update the server status or add it if it doesn't exist
+            if(server){
+                server.status = "online"
+                redisInstance.set("servers", redisInstance.get("servers").map(server => server.server_id == message.identifier ? server : server))
+                verboseLog("server status updated")
+            }else{
+                redisInstance.set("servers", [...redisInstance.get("servers"), {server_id: message.identifier, status: "online"}])
+                verboseLog("server added")
             }
+            //send a message to servers and global chat saying that the server has connected
+            discordInstance.sendToGlobal(`[${message.identifier}] Websocket has connected.`)
+            discordInstance.sendToServer(message.identifier, `Websocket has connected.`)
         }
     })
 }

@@ -27,12 +27,12 @@ const route = {
         })
     },
     wsHandler: (conn, req) => {
-        global.verboseLog("websocket connection recieved")
+        verboseLog("websocket connection recieved")
         conn.setEncoding('utf8')
         conn.socket.send(JSON.stringify({
             event: "identify"
         }))
-        global.verboseLog("identify event sent")
+        verboseLog("identify event sent")
         fs.readdirSync(`./routes/WSSMessagingEvents`).forEach(event => {
             let eventHandle = require(`./WSSMessagingEvents/${event}`)
             if (Array.isArray(eventHandle)) {

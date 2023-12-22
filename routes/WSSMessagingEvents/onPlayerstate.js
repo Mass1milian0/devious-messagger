@@ -16,39 +16,41 @@ Devious Messager is free software: you can redistribute it and/or modify
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   
 */
+const verboseLog = require("./../services/logger.js")
+const redisInstance = require("./../services/redisInstance.js")
+const {client, discordInstance} = require("./../services/discordInstance.js")
 module.exports = (conn, req) => {
     conn.socket.on('message', (message) => {
         message = JSON.parse(message)
         if (message.event == "playerState") {
-            global.verboseLog("playerState event recieved with player: " + message.player + " on server: " + message.server + " with state: " + message.joined + " and uuid: " + message.uuid)
-            let server = message.server
+            verboseLog("playerState event recieved with player: " + message.player + " on server: " + message.server + " with state: " + message.joined + " and uuid: " + message.uuid)
+            let identifier = message.server
             let player = message.player
             let state = message.joined
             let uuid = message.uuid
             let userIcon = `https://crafatar.com/avatars/${uuid}`;
-            if(!global.wssConnectedPeers[server]){
-                global.verboseLog("server not found in wssConnectedPeers, adding it to the list")
-                global.wssConnectedPeers[server] = conn
-                if(global.serverInfo[message.identifier]){
-                    global.serverInfo[message.identifier].status = "online"
-                }else{
-                    global.serverInfo[message.identifier] = {
-                        status: "online"
-                    }
-                }
+            this.websocketManager.addPeer(identifier, conn)
+            let server = redisInstance.get("servers").find(server => server.server_id == identifier)
+            //update the server status or add it if it doesn't exist
+            if(server){
+                server.status = "online"
+                redisInstance.set("servers", redisInstance.get("servers").map(server => server.server_id == identifier ? server : server))
+                verboseLog("server status updated")
+            }else{
+                redisInstance.set("servers", [...redisInstance.get("servers"), {server_id: identifier, status: "online"}])
+                verboseLog("server added")
             }
-            global.playerCount = 0
-            Object.values(global.wssConnectedPeers).forEach(peer => {
-                peer.socket.send(JSON.stringify({
-                    event: "playerCount"
-                }))
-            })
+            redisInstance.set("totalPlayerCount", count)
+            this.websocketManager.sendToAll(JSON.stringify({
+                event: "playerCount",
+            }))
+
             if(state == "joined"){
-                global.discordMessager.sendToServer(server, `${player} joined the game.`, player, userIcon)
-                global.discordMessager.sendToGlobal(`[${server}] ${player} joined the game.`, player, userIcon)
+                discordInstance.sendToServer(identifier, `${player} joined the game.`, player, userIcon)
+                discordInstance.sendToGlobal(`[${identifier}] ${player} joined the game.`, player, userIcon)
             }else {
-                global.discordMessager.sendToServer(server, `${player} left the game.`, player, userIcon)
-                global.discordMessager.sendToGlobal(`[${server}] ${player} left the game.`, player, userIcon)
+                discordInstance.sendToServer(identifier, `${player} left the game.`, player, userIcon)
+                discordInstance.sendToGlobal(`[${identifier}] ${player} left the game.`, player, userIcon)
             }
         }
     })

@@ -16,43 +16,41 @@ Devious Messager is free software: you can redistribute it and/or modify
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   
 */
+const verboseLog = require("./../services/logger.js")
+const redisInstance = require("./../services/redisInstance.js")
+const {client, discordInstance} = require("./../services/discordInstance.js")
 module.exports = (conn, req) => {
     conn.socket.on('message', (message) => {
         message = JSON.parse(message)
         if (message.event == "message") {
-            global.verboseLog("message event recieved by: " + message.player + " on server: " + message.server + " in channel: " + message.channel + " with message: " + message.message + " and uuid: " + message.uuid)
-            let server = message.server
+            verboseLog("message event recieved by: " + message.player + " on server: " + message.server + " in channel: " + message.channel + " with message: " + message.message + " and uuid: " + message.uuid)
+            let identifier = message.server
             let player = message.player
             let content = message.message
             let uuid = message.uuid
             let channel = message.channel
             let userIcon = `https://crafatar.com/avatars/${uuid}`;
-            //kick in the emergency identification system
-            if(!global.wssConnectedPeers[server]){
-                global.verboseLog("server not found in wssConnectedPeers, adding it to the list")
-                global.wssConnectedPeers[server] = conn
-                if(global.serverInfo[message.identifier]){
-                    global.serverInfo[message.identifier].status = "online"
-                }else{
-                    global.serverInfo[message.identifier] = {
-                        status: "online"
-                    }
-                }
+            this.websocketManager.addPeer(identifier, conn)
+            let server = redisInstance.get("servers").find(server => server.server_id == identifier)
+            //update the server status or add it if it doesn't exist
+            if(server){
+                server.status = "online"
+                redisInstance.set("servers", redisInstance.get("servers").map(server => server.server_id == identifier ? server : server))
+                verboseLog("server status updated")
+            }else{
+                redisInstance.set("servers", [...redisInstance.get("servers"), {server_id: identifier, status: "online"}])
+                verboseLog("server added")
             }
-            global.discordMessager.sendToGlobal(`[${server}]: ${content}`, `${player} / ${channel}`, userIcon)
-            global.discordMessager.sendToServer(server, `${content}`, `${player} / ${channel}`, userIcon)
+            discordInstance.sendToGlobal(`[${identifier}]: ${content}`, `${player} / ${channel}`, userIcon)
+            discordInstance.sendToServer(identifier, `${content}`, `${player} / ${channel}`, userIcon)
             //send globally to all connected peers but the sender
-            Object.values(global.wssConnectedPeers).forEach(peer => {
-                if (peer.socket != conn.socket) {
-                    peer.socket.send(JSON.stringify({
-                        event: "message",
-                        username: player,
-                        channel: "global",
-                        serverName: server,
-                        message: content
-                    }))
-                }
-            })
+            this.websocketManager.sentToAll(JSON.stringify({
+                event: "message",
+                username: player,
+                channel: channel,
+                serverName: identifier,
+                message: content,
+            }), true, identifier)
         }
     })
 }

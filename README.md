@@ -19,6 +19,10 @@ DISCORD_TOKEN: # your discord bot token
 CLIENTID: # your discord bot client id
 GUILDID: # your discord guild id
 BOT_AVATAR_URL: # your url for the bot avatar
+SQL_HOST: # your sql host
+SQL_USER: # your sql user
+SQL_PASSWORD: # your sql password
+SQL_DATABASE: # your sql database
 NODE_ENV: # the environment the server is running in (development or production)
 ```
 

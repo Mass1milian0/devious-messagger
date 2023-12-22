@@ -1,8 +1,9 @@
+const {client, discordInstance} = require('../services/discordInstance.js');
 let route = {
     method:"GET",
     url:"/v1/DiscordAnnouncements",
     handler: async (req,reply)=>{
-        let response = await global.discordMessager.getAnnouncements(10);
+        let response = await discordInstance.getAnnouncements(10);
         reply.send(JSON.stringify(response));
     }
     
