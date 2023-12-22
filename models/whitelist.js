@@ -2,17 +2,15 @@ const references = {
     Whitelist: [
         {
             schema: 'users',
-            table: 'users',
-            column: 'user_uuid',
             relation: 'belongsTo',
-            foreignKey: 'user_uuid'
+            foreignKey: 'whitelist_user_uuid',
+            targetKey: 'user_uuid'
         },
         {
             schema: 'servers',
-            table: 'servers',
-            column: 'server_id',
             relation: 'belongsTo',
-            foreignKey: 'server_id'
+            foreignKey: 'whitelist_server_id',
+            targetKey: 'server_id'
         }
     ]
 }

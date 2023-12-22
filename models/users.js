@@ -7,6 +7,10 @@ function init(connection,Sequelize) {
             allowNull: false,
             primaryKey: true
         },
+        user_discord_id: {
+            type: Sequelize.STRING(255),
+            allowNull: false
+        },
         user_coins: {
             type: Sequelize.INTEGER,
             allowNull: false

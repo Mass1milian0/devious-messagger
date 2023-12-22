@@ -19,12 +19,13 @@ Devious Messager is free software: you can redistribute it and/or modify
 const verboseLog = require("./../services/logger.js")
 const redisInstance = require("./../services/redisInstance.js")
 const {client, discordInstance} = require("./../services/discordInstance.js")
+const websocketManager = require('../../services/websocketInstance')
 module.exports = async (conn, req) => {
     conn.socket.on('message', (message) => {
         message = JSON.parse(message)
         if(message.event == "identify"){
             verboseLog("identify event recieved by" + message.identifier)
-            this.websocketManager.addPeer(message.identifier, conn)
+            websocketManager.addPeer(message.identifier, conn)
             let server = redisInstance.get("servers").find(server => server.server_id == message.identifier)
             //update the server status or add it if it doesn't exist
             if(server){

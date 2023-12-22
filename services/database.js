@@ -57,7 +57,8 @@ function setupAssociations() {
                         break;
                     case 'belongsTo':
                         model.belongsTo(relatedModel, {
-                            foreignKey: ref.foreignKey
+                            foreignKey: ref.foreignKey,
+                            targetKey: ref.targetKey
                         });
                         break;
                     case 'hasOne':

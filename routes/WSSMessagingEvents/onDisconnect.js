@@ -20,25 +20,27 @@ require('dotenv').config();
 const verboseLog = require('../../services/logger')
 const redisInstance = require('../../services/redisInstance')
 const {client, discordInstance} = require('../../services/discordInstance')
+const websocketManager = require('../../services/websocketInstance')
 module.exports = (conn, req) => {
-    conn.socket.on('close', () => {
+    conn.socket.on('close', async() => {
         verboseLog("websocket connection closed")
         //check who closed the connection
         let closed 
-        let peers = this.websocketManager.getAllPeers()
+        let peers = websocketManager.getAllPeers()
         for (let i of Object.keys(peers)){
             if(peers[i] == conn){
                 closed = i
             }
         }
-        let server = redisInstance.get("servers").find(server => server.server_id == message.identifier)
+        let server = await redisInstance.get("servers")
+        server = server.find(server => server.server_id == closed)
         //update the server status or add it if it doesn't exist
         if(server){
             server.status = "unreachable"
             redisInstance.set("servers", redisInstance.get("servers").map(server => server.server_id == message.identifier ? server : server))
             verboseLog("server status updated")
         }
-        this.websocketManager.removePeer(closed)
+        websocketManager.removePeer(closed)
         //send a message to servers and global chat saying that the server has disconnected
         discordInstance.sendToGlobal(`[${closed}] Websocket has disconnected.`)
         discordInstance.sendToServer(closed, `Websocket has disconnected.`)

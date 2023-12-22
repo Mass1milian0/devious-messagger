@@ -99,16 +99,11 @@ client.on("ready", async() => {
     })
     discordInstance.on("ticketCreated", (channel) => {
         verboseLog("ticket created event recieved from discord")
-        let names = fs.readFileSync("./staffMap.json")
-        names = JSON.parse(names)
-        let staff = names.map(name => name.name) ///this returns: ["name1","name2","name3"]
-        Object.values(global.wssConnectedPeers).forEach(peer => {
-            peer.socket.send(JSON.stringify({
-                event: "ticket",
-                names: staff,
-                message: "Ticket created: " + channel.name
-            }))
-        })
+        websocketManager.sentToAll(JSON.stringify({
+            event: "ticket",
+            names: staff,
+            message: "Ticket created: " + channel.name
+        }))
     })
     setTimeout(() => {
         global.playerCount = 0 

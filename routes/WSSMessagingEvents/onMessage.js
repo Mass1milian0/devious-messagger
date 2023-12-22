@@ -19,6 +19,7 @@ Devious Messager is free software: you can redistribute it and/or modify
 const verboseLog = require("./../services/logger.js")
 const redisInstance = require("./../services/redisInstance.js")
 const {client, discordInstance} = require("./../services/discordInstance.js")
+const websocketManager = require('../../services/websocketInstance')
 module.exports = (conn, req) => {
     conn.socket.on('message', (message) => {
         message = JSON.parse(message)
@@ -30,7 +31,7 @@ module.exports = (conn, req) => {
             let uuid = message.uuid
             let channel = message.channel
             let userIcon = `https://crafatar.com/avatars/${uuid}`;
-            this.websocketManager.addPeer(identifier, conn)
+            websocketManager.addPeer(identifier, conn)
             let server = redisInstance.get("servers").find(server => server.server_id == identifier)
             //update the server status or add it if it doesn't exist
             if(server){
@@ -44,7 +45,7 @@ module.exports = (conn, req) => {
             discordInstance.sendToGlobal(`[${identifier}]: ${content}`, `${player} / ${channel}`, userIcon)
             discordInstance.sendToServer(identifier, `${content}`, `${player} / ${channel}`, userIcon)
             //send globally to all connected peers but the sender
-            this.websocketManager.sentToAll(JSON.stringify({
+            websocketManager.sentToAll(JSON.stringify({
                 event: "message",
                 username: player,
                 channel: channel,

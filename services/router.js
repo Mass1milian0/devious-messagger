@@ -34,7 +34,6 @@ fastify.get(
         return reply.sendFile('./index.html')
     }
 )
-fastify.decorate('websocketManager', websocketManager)
 const start = async () => {
     try {
         fastify.listen({port: port, host: '0.0.0.0'})

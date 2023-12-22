@@ -70,17 +70,20 @@ function insertMockdata() {
             server_id: 'ATM9',
             server_name: 'ATM9',
             server_ip: 'atm9.devious.gg',
+            server_amp_id: 'ATM901'
         },
         {
             server_id: 'E9E',
             server_name: 'E9E',
             server_ip: 'e9e.devious.gg',
+            server_amp_id: 'E9E01'
         }
     ]
 
     let users = [
         {
             user_uuid: 'a954dc31-6031-44a3-a4fa-d7bd25b9314b',
+            user_discord_id: '342800846595031050',
             user_coins: 0,
         },
         {
@@ -90,15 +93,29 @@ function insertMockdata() {
         },
         {
             user_uuid: 'fake-user-uuid2',
+            user_discord_id: 'fake-user-discord-id2',
             user_coins: 0,
         },
         {
             user_uuid: 'fake-user-uuid3',
+            user_discord_id: 'fake-user-discord-id3',
             user_coins: 0,
         },
         {
             user_uuid: 'fake-staff-uuid',
+            user_discord_id: 'fake-staff-discord-id',
             user_coins: 0,
+        }
+    ]
+
+    let whitlist = [
+        {
+            whitelist_user_uuid: 'a954dc31-6031-44a3-a4fa-d7bd25b9314b',
+            whitelist_server_id: 'ATM9',
+        },
+        {
+            whitelist_user_uuid: 'a954dc31-6031-44a3-a4fa-d7bd25b9314b',
+            whitelist_server_id: 'E9E',
         }
     ]
 
@@ -138,6 +155,7 @@ function insertMockdata() {
     database.ranks.bulkCreate(ranks)
     database.users.bulkCreate(users)
     database.usersRank.bulkCreate(userRanks)
+    database.whitelist.bulkCreate(whitlist)
 }
 
 module.exports = insertMockdata
